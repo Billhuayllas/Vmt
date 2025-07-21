@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programa para la Reunión de entre semana</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body{font-family:Arial,Helvetica,sans-serif;background-color:#e9e9e9;color:#000;margin:0;padding:20px}
+        .container{max-width:1000px;margin:0 auto;background:#fff;padding:30px 40px;box-shadow:0 0 15px rgba(0,0,0,.1)}
+        .main-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #000;padding-bottom:5px;margin-bottom:25px}
+        .main-header h1{font-size:1.1em;font-weight:400;margin:0;padding-top:5px}
+        .main-header .title-right{text-align:center;font-size:1.2em;font-weight:700}
+        .week-selector-container{text-align:center;margin:20px 0 30px;background-color:#f0f0f0;padding:15px;border-radius:8px}
+        #week-selector{padding:10px;font-size:1em;border-radius:5px;border:1px solid #ccc;min-width:300px}
+        .top-info-block{float:right;text-align:left;font-size:.95em}
+        .top-info-block div{margin-bottom:4px}
+        .top-info-block strong{display:inline-block;width:120px}
+        .top-content{padding-bottom:15px}
+        .section-title{color:#fff;padding:5px 12px;margin:30px 0 15px;font-weight:700;display:inline-block;min-width:250px}
+        .title-tesoros{background-color:#585858}
+        .title-maestros{background-color:#fbc246}
+        .title-vida{background-color:#c00000}
+        table{width:100%;border-collapse:collapse;font-size:.95em}
+        th,td{padding:10px 5px;text-align:left;vertical-align:top;border:none}
+        thead th{font-weight:400;color:#555;text-align:center}
+        .assignments-table td{border-bottom:1px solid #e0e0e0}
+        #vida-cristiana-table-body tr:last-child td{border-bottom:none}
+        .editable{width:100%;border:none;background-color:transparent;padding:4px 2px;font-family:inherit;font-size:inherit;color:inherit;box-sizing:border-box}
+        .editable:focus{outline:0;background-color:#e8f0fe;box-shadow:0 0 0 2px #cde2ff;border-radius:2px}
+        .part-description{width:45%}
+        .col-aux2{width:18%}
+        .col-aux3{width:18%}
+        .col-main{width:19%}
+        .final-assignments{text-align:right;margin-top:20px}
+        .final-assignments div{margin-bottom:10px;font-size:.95em}
+        .final-assignments strong{display:inline-block;width:130px;text-align:left}
+        .final-assignments .editable{width:220px;border-bottom:1px dotted #888}
+        .clearfix::after{content:"";clear:both;display:table}
+        .save-button-container{text-align:center;margin:30px 0}
+        #save-button{background-color:#007bff;color:#fff;font-size:1.2em;padding:12px 25px;border:none;border-radius:5px;cursor:pointer;transition:background-color .3s}
+        #save-button:hover{background-color:#0056b3}
+        #save-status{text-align:center;margin-top:15px;font-weight:700;height:20px}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-header"><h1>15 DE JULIO</h1><div class="title-right">PROGRAMA PARA LA REUNIÓN DE ENTRE SEMANA</div></div>
+        <div class="week-selector-container"><label for="week-selector"><b>Seleccione la semana:</b></label><br><br><select id="week-selector"></select></div>
+        <div class="top-content clearfix">
+            <div class="top-info-block">
+                <div><strong>Presidente:</strong> <input type="text" id="presidente" class="editable" style="width: 180px;"></div>
+                <div><strong>Sala auxiliar N°2:</strong> <input type="text" id="auxiliar-2" class="editable" style="width: 180px;"></div>
+                <div><strong>Sala auxiliar N°3:</strong> <input type="text" id="auxiliar-3" class="editable" style="width: 180px;"></div>
+                <div><strong>Oración de Inicio:</strong> <input type="text" id="oracion-inicio" class="editable" style="width: 180px;"></div>
+            </div>
+            <h2 id="week-title" style="font-size:1.2em; font-weight:bold; margin-top:0;"></h2>
+        </div>
+        <div><p style="margin-top: 0; font-size: 0.95em;">• <b id="cancion-inicio"></b></p><p style="font-size: 0.95em;">• Palabras de introducción (1 min.)</p></div>
+        <div class="section-title title-tesoros">TESOROS DE LA BIBLIA</div>
+        <table class="assignments-table">
+            <thead><tr><th class="part-description"></th><th class="col-aux2">Sala Auxiliar N°2</th><th class="col-aux3">Sala Auxiliar N°3 (7:00 p. m.)</th><th class="col-main">Auditorio principal</th></tr></thead>
+            <tbody>
+                <tr><td id="tesoros-p1-title"></td><td>-</td><td>-</td><td><input type="text" id="tesoros-p1-main" class="editable"></td></tr>
+                <tr><td id="tesoros-p2-title"></td><td>-</td><td>-</td><td><input type="text" id="tesoros-p2-main" class="editable"></td></tr>
+                <tr><td id="tesoros-p3-title"></td><td><input type="text" id="tesoros-p3-aux2" class="editable"></td><td><input type="text" id="tesoros-p3-aux3" class="editable"></td><td><input type="text" id="tesoros-p3-main" class="editable"></td></tr>
+            </tbody>
+        </table>
+        <div class="section-title title-maestros">SEAMOS MEJORES MAESTROS</div>
+        <table class="assignments-table"><thead><tr><th class="part-description"></th><th class="col-aux2">Sala Auxiliar N°2</th><th class="col-aux3">Sala Auxiliar N°3 (7:00 p. m.)</th><th class="col-main">Auditorio principal</th></tr></thead><tbody id="maestros-body"></tbody></table>
+        <div class="section-title title-vida">NUESTRA VIDA CRISTIANA</div>
+        <table class="assignments-table"><tbody id="vida-cristiana-table-body"></tbody></table>
+        <div class="final-assignments"><div><strong>Conductor/Lector:</strong> <input type="text" id="conductor-lector" class="editable"></div></div>
+        <div style="margin-top: 20px; font-size: 0.95em;"><p>• Palabras de conclusión (3 mins.)</p><p>• <b id="cancion-final"></b></p></div>
+        <div class="final-assignments" style="margin-top: 25px;"><div><strong>Oración Final:</strong> <input type="text" id="oracion-final" class="editable"></div></div>
+        
+        <div class="save-button-container">
+            <button id="save-button">Guardar Cambios</button>
+            <div id="save-status"></div>
+        </div>
+    </div>
+
+    <script>
+    // 1. CONFIGURACIÓN DE SUPABASE - PEGA TUS CLAVES AQUÍ
+    const SUPABASE_URL = 'PEGA TU URL AQUÍ'; 
+    const SUPABASE_ANON_KEY = 'PEGA TU CLAVE ANON AQUÍ';
+
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 2. DATOS POR DEFECTO COMPLETOS (RESTAURADOS)
+    const programaData = {
+        "2024-07-07":{titulo:"7-13 DE JULIO | PROVERBIOS 21",presidentes:{principal:"Bill Huayllas",aux2:"Mario Parco",aux3:"Luis Quispe"},oracion:{inicio:"Alberto Quispe",final:"Anderson Custodio"},canciones:{inicio:"Canción 98",final:"Canción 72",vidaCristiana:"Canción 132"},tesoros:{p1:{title:"1. Sabios consejos para un matrimonio feliz (10 mins.)",main:"Floriano Vilchez"},p2:{title:"2. Busquemos perlas escondidas (10 mins.)",main:"Daniel Tafur"},p3:{title:"3. Lectura de la Biblia (4 mins.)",main:"Daniel León",aux2:"Oswaldo Torres",aux3:"Hanz Cajas"}},maestros:[{title:"4. Empiece conversaciones (3 mins.)",main:"Mileyka Galvez / Alicia Bautista",aux2:"Beatriz Anchirayco / Nora Rosales",aux3:"Jessica Torres / Yolanda Cárdenas"},{title:"5. Haga revisitas (4 mins.)",main:"Giovanna Pomalazo / Eddy Elescano",aux2:"Nicol Bartolo / Mayumi Chávez",aux3:"Ariana Cárdenas / Iris Pacheco"},{title:"6. Explique sus creencias (5 mins.)",main:"Indira Quispe / Yadira Huayllas",aux2:"Juana Cachuco / Mariluz Navarrete",aux3:"Marleni Cárdenas / Deysi Custodio"}],vidaCristiana:{partes:["Que haya respeto en su matrimonio (15 mins.)","Estudio bíblico de la congregación (30 mins.)"],conductor:"Galindo Cárdenas",lector:"Joseph Chávez / Adrián Torres"}},
+        "2024-07-14":{titulo:"14-20 DE JULIO | PROVERBIOS 22",presidentes:{principal:"Royer Alejandro",aux2:"Daniel Tafur",aux3:"Wilson Becerra"},oracion:{inicio:"Joseph Chávez",final:"Cajas Mercurio"},canciones:{inicio:"Canción 79",final:"Canción 6",vidaCristiana:"Canción 134"},tesoros:{p1:{title:"1. Sabios consejos para criar a los hijos (10 mins.)",main:"Bill Huayllas"},p2:{title:"2. Busquemos perlas escondidas (10 mins.)",main:"Pastor Cachuco"},p3:{title:"3. Lectura de la Biblia (4 mins.)",main:"Giereth Tafur",aux2:"Vidal Rosales",aux3:"David Díaz"}},maestros:[{title:"4. Empiece conversaciones (3 mins.)",main:"Elidora Cajas / Juana Cachuco",aux2:"Elizabeth Arias / Stefany Vallejos",aux3:"Andrea Bartolo / Azucena Flores"},{title:"5. Empiece conversaciones (4 mins.)",main:"Luz Molina Cruz / Aúrea Ccahuna",aux2:"Edy Elescano / Teresa Flores",aux3:"Yadira Huayllas / Carolina Tafur"},{title:"6. Discurso (5 mins.)",main:"Anderson Custodio",aux2:"Eduardo Navarrete",aux3:"Héctor Poma"}],vidaCristiana:{partes:["Sean pacientes, pero no permisivos (15 mins.)",'Estudio bíblico de la congregación (30 mins.) (Nuevo libro "Lecciones que aprendo de la Biblia")'],conductor:"Floriano Vilchez",lector:"Galindo Cárdenas / Alexander Quispe"}},
+        "2024-07-21":{titulo:"21-27 DE JULIO | PROVERBIOS 23",presidentes:{principal:"Joseph Chávez",aux2:"Wilson Becerra",aux3:"Galindo Cárdenas"},oracion:{inicio:"Hector Poma",final:"Daniel León"},canciones:{inicio:"Canción 97",final:"Canción 40",vidaCristiana:"Canción 35"},tesoros:{p1:{title:"1. Sabios consejos sobre las bebidas alcohólicas (10 mins.)",main:"Wilson Becerra"},p2:{title:"2. Busquemos perlas escondidas (10 mins.)",main:"Mario Parco"},p3:{title:"3. Lectura de la Biblia (4 mins.)",main:"Eduardo Parco",aux2:"Damián Paytán",aux3:"Aaron Quispe"}},maestros:[{title:"4. Empiece conversaciones (2 mins.)",main:"Liliana Bautista / Alicia Bautista",aux2:"Leonor Cervantes / Vilma León",aux3:"Matías Arias / Anderson Custodio"},{title:"5. Haga revisitas (5 mins.)",main:"Melani Torres / Alisson Díaz",aux2:"Herlinda Cuba / Consuelo Pillaca",aux3:"Hermelinda Cajas / Carolina Casillas"},{title:"6. Haga discípulos (5 mins.)",main:"Yadira Huayllas / Maribel Mozombite",aux2:"Silvia Quispe / María Saavedra",aux3:"Rosa Sifuentes / Elsa Regalado"}],vidaCristiana:{partes:["¿Estará bien que sirva alcohol? (8 mins.)","Necesidades de la congregación (7 mins.)","Estudio bíblico de la congregación (30 mins.)"],conductor:"Galindo Cárdenas",lector:"Anderson Custodio"}},
+        "2024-07-28":{titulo:"28 DE JULIO - 3 DE AGOSTO | PROVERBIOS 24",presidentes:{principal:"Royer Alejandro",aux2:"Mario Parco",aux3:"Wilson Becerra"},oracion:{inicio:"Galindo Cárdenas",final:"Pedro Saavedra"},canciones:{inicio:"Canción 38",final:"Canción 112",vidaCristiana:"Canción 99"},tesoros:{p1:{title:"1. Fortalézcase ahora para las situaciones difíciles (10 mins.)",main:"Daniel Tafur"},p2:{title:"2. Busquemos perlas escondidas (10 mins.)",main:"Luis Quispe"},p3:{title:"3. Lectura de la Biblia (4 mins.)",main:"Anderson Custodio",aux2:"Egeguren Nieto",aux3:"Jhon Huayllas"}},maestros:[{title:"4. Empiece conversaciones (2 mins.)",main:"Graciela Becerra / Thalía Ayala",aux2:"Yolanda Cárdenas / Raquel Huaycaychuco",aux3:"Leydi de la Cruz / Mishelly Córdova"},{title:"5. Empiece conversaciones (3 mins.)",main:"Camila Córdova / Indira Quispe",aux2:"Nélida Carhuaz / Giovanna Pomalazo",aux3:"Mayumi Chávez / Damaris Flores"},{title:"6. Empiece conversaciones (3 mins.)",main:"Giereth Tafur / Marcelo Anchirayco",aux2:"Tatiana Cifuentes / Deysi Custodio",aux3:"André Torres / Eduardo Navarrete"},{title:"7. Discurso (3 mins.)",main:"Vidal Rosales",aux2:"Damfort Díaz",aux3:"Mitchel Tafur"}],vidaCristiana:{partes:["Ayudémonos unos a otros en los momentos difíciles (15 mins.)","Estudio bíblico de la congregación (30 mins.)"],conductor:"Galindo Cárdenas",lector:"Floriano Vilchez / Damfoth Díaz"}},
+        "2024-08-04":{titulo:"4-10 DE AGOSTO | PROVERBIOS 25",presidentes:{principal:"Bill Huayllas",aux2:"Daniel Tafur",aux3:"Luis Quispe"},oracion:{inicio:"Floriano Vilchez",final:"Giereth Tafur"},canciones:{inicio:"Canción 154",final:"Canción 150",vidaCristiana:"Canción 123"},tesoros:{p1:{title:"1. Sabios consejos para mejorar nuestra forma de hablar (10 mins.)",main:"Joseph Chávez"},p2:{title:"2. Busquemos perlas escondidas (10 mins.)",main:"Jorge Flores"},p3:{title:"3. Lectura de la Biblia (4 mins.)",main:"Matías Arias",aux2:"André Torres",aux3:"Warren Díaz"}},maestros:[{title:"4. Empiece conversaciones (3 mins.)",main:"Cirila Sabedra / Gladys Quispe",aux2:"Rosales Nora / María Torres",aux3:"Consuelo Pillaca / Carmen Poma"},{title:"5. Haga revisitas (4 mins.)",main:"Marleni Cárdenas / Margarita Quispe",aux2:"Stefany Vallejos / Rosario Quiroz",aux3:"Raquel Huacaychuco / Jessica Licares"},{title:"6. Discurso (5 mins.)",main:"Giereth Tafur",aux2:"Adrián Torres",aux3:"Daniel León"}],vidaCristiana:{partes:["Necesidades de la congregación (15 mins.)","Estudio bíblico de la congregación (30 mins.)"],conductor:"Floriano Vilchez",lector:"Royer Alejandro / Eduardo Parco"}},
+        "2024-08-11":{titulo:"11-17 DE AGOSTO | PROVERBIOS 26",presidentes:{principal:"Floriano Vilchez",aux2:"Mario Parco",aux3:"Joseph Chávez"},oracion:{inicio:"Daniel Tafur",final:"Oswaldo Torres"},canciones:{inicio:"Canción 88",final:"Canción 89",vidaCristiana:"Canción 94"},tesoros:{p1:{title:"1. Apartémonos de los insensatos (10 mins.)",main:"Galindo Cárdenas"},p2:{title:"2. Busquemos perlas escondidas (10 mins.)",main:"Pastor Cachuco"},p3:{title:"3. Lectura de la Biblia (4 mins.)",main:"Vicente Dávila",aux2:"Eder Torres",aux3:"Jheyro Tamaní"}},maestros:[{title:"4. Empiece conversaciones (3 mins.)",main:"Mitchel Tafur / Vidal Rosales",aux2:"María Saavedra / Rosa Mallma",aux3:"Azucena Flores / Marleni Cárdenas"},{title:"5. Haga revisitas (4 mins.)",main:"Carolina Tafur / Indira Quispe",aux2:"Maribel Mozombite / Juana Cachuco",aux3:"Mariluz Navarrete / Angélica García"},{title:"6. Haga discípulos (5 mins.)",main:"Áurea Ccahuana / Yolanda Ferreyra",aux2:"Alicia Bautista / Rocío de la Cruz",aux3:"Alisson Díaz / Yadira Huayllas"}],vidaCristiana:{partes:['El estudio personal puede darle "la sabiduría necesaria para la salvación" (15 mins.)',"Estudio bíblico de la congregación (30 mins.)"],conductor:"Joseph Chávez",lector:"Luis Quispe / Anderson Custodio"}},
+        "2024-08-18":{titulo:"18-24 DE AGOSTO | PROVERBIOS 27",presidentes:{principal:"Galindo Cárdenas",aux2:"Joseph Chávez",aux3:"Daniel Tafur"},oracion:{inicio:"Royer Alejandro",final:"Eduardo Navarrete"},canciones:{inicio:"Canción 102",final:"Canción 118",vidaCristiana:"Canción 109"},tesoros:{p1:{title:"1. Cómo nos beneficia tener amigos verdaderos (10 mins.)",main:"Mario Parco"},p2:{title:"2. Busquemos perlas escondidas (10 mins.)",main:"Pastor Cachuco"},p3:{title:"3. Lectura de la Biblia (4 mins.)",main:"Caleb Huayllas",aux2:"Vicente Dávila",aux3:"Abel Quispe"}},maestros:[{title:"4. Empiece conversaciones (3 mins.)",main:"María Saavedra / Thalía Ayala",aux2:"Elsa Regalado / Rosa Sifuentes",aux3:"Teresa Flores / Ariana Cárdenas"},{title:"5. Haga revisitas (4 mins.)",main:"Vilma León / Eddy Elescano",aux2:"Magaly Huamán / Nicol Bartolo",aux3:"Carolina Casillas / Stefany Vallejos"},{title:"6. Discurso (5 mins.)",main:"Héctor Poma",aux2:"Eduardo Parco",aux3:"Alexander Quispe"}],vidaCristiana:{partes:['"Un hermano en tiempos de angustia" (15 mins.)',"Estudio bíblico de la congregación (30 mins.)"],conductor:"Daniel Tafur",lector:"Adrián Torres"}},
+        "2024-08-25":{titulo:"25-31 DE AGOSTO | PROVERBIOS 28",presidentes:{principal:"Luis Quispe",aux2:"Mario Parco",aux3:"Wilson Becerra"},oracion:{inicio:"Joseph Chávez",final:"Sebastián Pacheco"},canciones:{inicio:"Canción 150",final:"Canción 113",vidaCristiana:"Canción 112"},tesoros:{p1:{title:"1. Diferencias entre el justo y el malvado (10 mins.)",main:"Daniel Tafur"},p2:{title:"2. Busquemos perlas escondidas (10 mins.)",main:"Pedro Saavedra"},p3:{title:"3. Lectura de la Biblia (4 mins.)",main:"Aaron Quispe",aux2:"Antonio Cruz",aux3:"Mitchel Tafur"}},maestros:[{title:"4. Empiece conversaciones (3 mins.)",main:"Cinthia Torres / Graciela Becerra",aux2:"Cielo Lobo / Mayumi Chávez",aux3:"Damaris Flores / Gladys Quispe"},{title:"5. Empiece conversaciones (3 mins.)",main:"Tatiana Cifuentes / Jessica Torres",aux2:"Julia Antay / Dina Pinto",aux3:"Mishelly Córdova / Áurea Ccahuana"},{title:"6. Empiece conversaciones (2 mins.)",main:"Deysi Custodio / Marleni Cárdenas",aux2:"Yajaira Lobo / Yolanda Vilchez",aux3:"Carmen Poma / Alisson Díaz"},{title:"7. Empiece conversaciones (3 mins.)",main:"Norma Nieto / Giovanna Pomalazo",aux2:"Margarita Quispe / Silvia Quispe",aux3:"Giereth Tafur / Floriano Vilchez"}],vidaCristiana:{partes:["¿Odia usted la violencia? (6 mins.)","Campaña especial en septiembre (9 mins.)","Estudio bíblico de la congregación (30 mins.)"],conductor:"Wilson Becerra / Royer Alejandro",lector:"Joseph Chávez / Warren Díaz"}}
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const weekSelector = document.getElementById('week-selector');
+        const saveButton = document.getElementById('save-button');
+        const saveStatus = document.getElementById('save-status');
+
+        const programDataKeys = Object.keys(programaData);
+        programDataKeys.forEach(key => {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = programaData[key].titulo;
+            weekSelector.appendChild(option);
+        });
+
+        // FUNCIÓN PARA GUARDAR DATOS
+        async function saveWeekData() {
+            saveStatus.textContent = 'Guardando...';
+            saveStatus.style.color = '#007bff';
+            const weekKey = weekSelector.value;
+            
+            const dataToSave = {
+                week_id: weekKey,
+                data: {
+                    presidente: document.getElementById('presidente').value,
+                    auxiliar_2: document.getElementById('auxiliar-2').value,
+                    auxiliar_3: document.getElementById('auxiliar-3').value,
+                    oracion_inicio: document.getElementById('oracion-inicio').value,
+                    oracion_final: document.getElementById('oracion-final').value,
+                    conductor_lector: document.getElementById('conductor-lector').value,
+                    tesoros_p1_main: document.getElementById('tesoros-p1-main').value,
+                    tesoros_p2_main: document.getElementById('tesoros-p2-main').value,
+                    tesoros_p3_main: document.getElementById('tesoros-p3-main').value,
+                    tesoros_p3_aux2: document.getElementById('tesoros-p3-aux2').value,
+                    tesoros_p3_aux3: document.getElementById('tesoros-p3-aux3').value,
+                    maestros: Array.from(document.querySelectorAll('#maestros-body tr')).map(row => ({
+                        main: row.cells[3].querySelector('input').value,
+                        aux2: row.cells[1].querySelector('input').value,
+                        aux3: row.cells[2].querySelector('input').value
+                    }))
+                }
+            };
+            
+            const { error } = await db.from('programas').upsert(dataToSave);
+            
+            if (error) {
+                saveStatus.textContent = 'Error al guardar. Revisa la consola.';
+                saveStatus.style.color = '#dc3545';
+                console.error('Error de Supabase:', error);
+            } else {
+                saveStatus.textContent = '¡Guardado con éxito!';
+                saveStatus.style.color = '#28a745';
+            }
+        }
+
+        // FUNCIÓN PARA CARGAR DATOS
+        async function loadWeekData(weekKey) {
+            saveStatus.textContent = 'Cargando datos...';
+            const defaultData = programaData[weekKey];
+            
+            const { data: remoteData, error } = await db.from('programas').select('data').eq('week_id', weekKey).single();
+            
+            if (error && error.code !== 'PGRST116') { // Ignorar error "no se encontraron filas"
+                saveStatus.textContent = 'Error al cargar. Revisa la consola.';
+                console.error('Error de Supabase al cargar:', error);
+                return;
+            }
+            
+            const assignments = remoteData ? remoteData.data : {};
+            
+            // Rellenar formulario
+            document.getElementById('week-title').textContent = defaultData.titulo;
+            document.getElementById('cancion-inicio').innerHTML = defaultData.canciones.inicio;
+            document.getElementById('cancion-final').innerHTML = defaultData.canciones.final;
+            
+            document.getElementById('presidente').value = assignments.presidente || defaultData.presidentes.principal;
+            document.getElementById('auxiliar-2').value = assignments.auxiliar_2 || defaultData.presidentes.aux2;
+            document.getElementById('auxiliar-3').value = assignments.auxiliar_3 || defaultData.presidentes.aux3;
+            document.getElementById('oracion-inicio').value = assignments.oracion_inicio || defaultData.oracion.inicio;
+            document.getElementById('oracion-final').value = assignments.oracion_final || defaultData.oracion.final;
+            document.getElementById('conductor-lector').value = assignments.conductor_lector || `${defaultData.vidaCristiana.conductor || ''} / ${defaultData.vidaCristiana.lector || ''}`;
+            
+            document.getElementById('tesoros-p1-title').textContent = defaultData.tesoros.p1.title;
+            document.getElementById('tesoros-p1-main').value = assignments.tesoros_p1_main || defaultData.tesoros.p1.main;
+            document.getElementById('tesoros-p2-title').textContent = defaultData.tesoros.p2.title;
+            document.getElementById('tesoros-p2-main').value = assignments.tesoros_p2_main || defaultData.tesoros.p2.main;
+            document.getElementById('tesoros-p3-title').textContent = defaultData.tesoros.p3.title;
+            document.getElementById('tesoros-p3-main').value = assignments.tesoros_p3_main || defaultData.tesoros.p3.main;
+            document.getElementById('tesoros-p3-aux2').value = assignments.tesoros_p3_aux2 || defaultData.tesoros.p3.aux2;
+            document.getElementById('tesoros-p3-aux3').value = assignments.tesoros_p3_aux3 || defaultData.tesoros.p3.aux3;
+
+            const maestrosBody = document.getElementById('maestros-body');
+            maestrosBody.innerHTML = '';
+            defaultData.maestros.forEach((parte, index) => {
+                const remoteMaestro = assignments.maestros && assignments.maestros[index] ? assignments.maestros[index] : {};
+                const row = document.createElement('tr');
+                row.innerHTML = `<td class="part-description">${parte.title}</td>
+                                 <td><input type="text" class="editable" value="${remoteMaestro.aux2 || parte.aux2}"></td>
+                                 <td><input type="text" class="editable" value="${remoteMaestro.aux3 || parte.aux3}"></td>
+                                 <td><input type="text" class="editable" value="${remoteMaestro.main || parte.main}"></td>`;
+                maestrosBody.appendChild(row);
+            });
+            
+            const vidaCristianaBody = document.getElementById('vida-cristiana-table-body');
+            vidaCristianaBody.innerHTML = '';
+            const songRow = document.createElement('tr');
+            songRow.innerHTML = `<td colspan="4" style="padding-left: 5px;">• <b>${defaultData.canciones.vidaCristiana}</b></td>`;
+            vidaCristianaBody.appendChild(songRow);
+            defaultData.vidaCristiana.partes.forEach(parte => {
+                const partRow = document.createElement('tr');
+                partRow.innerHTML = `<td colspan="4" style="padding-left: 5px;">• ${parte.split(' - ')[0]}</td>`;
+                vidaCristianaBody.appendChild(partRow);
+            });
+
+            saveStatus.textContent = 'Datos cargados.';
+        }
+
+        // Event Listeners
+        weekSelector.addEventListener('change', (event) => loadWeekData(event.target.value));
+        saveButton.addEventListener('click', saveWeekData);
+        
+        // Carga inicial
+        if (programDataKeys.length > 0) { loadWeekData(programDataKeys[0]); }
+    });
+    </script>
+</body>
+</html>
